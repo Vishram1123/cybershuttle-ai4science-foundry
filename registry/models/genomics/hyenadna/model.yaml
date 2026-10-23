@@ -130,8 +130,11 @@ readiness:
     and full hg38 pretraining remain untested.
 
 maintainers:
-  - name: William Chen
-    github: "@wchen"  # placeholder — confirm exact handle before merging
+  - name: Vishal Subramanian Ramasubramanian
+    github: "@vishram1123"
+    affiliation: Georgia Institute of Technology
+  - name: Kevin Yin
+    github: "@kyin68"
     affiliation: Georgia Institute of Technology
 
 notes: >
