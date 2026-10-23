@@ -1,0 +1,103 @@
+# yaml-language-server: $schema=../../../../../schemas/execution_recipe.schema.json
+
+id: hyenadna-inference-nextnucleotide
+name: HyenaDNA — embeddings + next-nucleotide likelihood scoring (pretrained inference)
+model: hyenadna
+task: inference
+description: >
+  Reproduce pretrained HyenaDNA inference on GT PACE ICE / AI Makerspace: load the
+  hyenadna-tiny-1k-seqlen checkpoint from Hugging Face, run it on a real human
+  mRNA sequence (NCBI NM_000518.5, HBB) and on a length/composition-matched
+  scrambled control, and report per-position embeddings plus a next-nucleotide
+  log-likelihood / perplexity comparison between the two as the validation check.
+
+input:
+  format: FASTA
+  fields:
+    - name: sequence
+      type: string
+      description: Nucleotide sequence over {A,C,G,T,N}
+  example_file: data/NM_000518.5_HBB_mRNA.fasta
+  notes: >
+    Shipped example is a real NCBI RefSeq human sequence (committed to the repo,
+    ~630 bp) so the recipe is reproducible without relying on outbound network
+    access to NCBI from a compute node. Any FASTA file works as input.
+
+output:
+  format: NumPy array (.npy) + JSON report
+  description: >
+    results/embeddings_real.npy and results/embeddings_scrambled.npy (per-position
+    hidden states), plus results/validation_report.json containing mean
+    next-nucleotide log-likelihood / perplexity for the real sequence vs. the
+    scrambled control.
+
+steps:
+  - name: environment
+    description: >
+      Detect the allocated GPU's compute capability and install a matching
+      PyTorch/CUDA build, then install the remaining pure-Python inference
+      dependencies and clone the pinned upstream commit.
+    script: ../environment/setup_env.sh
+    notes: See environment/setup_env.sh — this is the GPU-architecture-portability step.
+
+  - name: inference
+    description: Run HyenaDNA on the real sequence and on a scrambled control, save embeddings and per-token logits.
+    script: ../scripts/run_inference.py
+    args:
+      checkpoint: hyenadna-tiny-1k-seqlen
+      input_fasta: ../data/NM_000518.5_HBB_mRNA.fasta
+      output_dir: ../results
+      device: cuda
+
+  - name: validate
+    description: >
+      Smoke test (correct output shape/dtype, no NaNs) plus substantive check
+      (real human sequence should get lower next-nucleotide perplexity under
+      the pretrained model than a nucleotide-composition-matched random
+      shuffle of the same sequence — evidence the pretrained weights encode
+      real genomic structure rather than producing arbitrary output).
+    script: ../scripts/validate_output.py
+    args:
+      results_dir: ../results
+      report: ../results/validation_report.json
+
+resource_requirements:
+  gpu_memory_gb: 4   # hyenadna-tiny-1k-seqlen inference is small; CPU-only also works for this checkpoint if no GPU is free
+  gpu_count: 1
+  recommended_gpu: "any — V100/A100/H100/H200 all supported via environment/setup_env.sh's compute-capability detection"
+  estimated_runtime: "< 5 min end-to-end (env setup dominates on a cold cache; inference itself is seconds for the 1k-seqlen checkpoint)"
+  storage_gb: 2  # checkpoint (~5MB for tiny-1k) + conda env
+
+compatible_resource_profiles:
+  - "GT PACE ICE, ice-gpu partition (AI Makerspace H100/H200 + V100/A100 nodes)"
+
+slurm_example: |
+  #!/bin/bash
+  #SBATCH --job-name=hyenadna-infer
+  #SBATCH --partition=ice-gpu
+  #SBATCH --gres=gpu:h100:1
+  #SBATCH --cpus-per-task=4
+  #SBATCH --mem=32G
+  #SBATCH --time=00:30:00
+  #SBATCH --output=logs/hyenadna-infer-%j.out
+  #SBATCH --error=logs/hyenadna-infer-%j.err
+
+  bash environment/setup_env.sh
+  source "$(conda info --base)/etc/profile.d/conda.sh"
+  conda activate hyenadna-infer
+
+  python scripts/run_inference.py \
+    --checkpoint hyenadna-tiny-1k-seqlen \
+    --input_fasta data/NM_000518.5_HBB_mRNA.fasta \
+    --output_dir results \
+    --device cuda
+
+  python scripts/validate_output.py \
+    --results_dir results \
+    --report results/validation_report.json
+
+notes: >
+  The full sbatch job script (with comments) lives at
+  registry/models/biology/hyenadna/slurm/infer_hyenadna_makerspace.sbatch.
+  For larger checkpoints (32k-seqlen and up), increase --mem and --time, and
+  check environment/setup_env.sh's VRAM guidance for hyenadna-large-1m-seqlen.

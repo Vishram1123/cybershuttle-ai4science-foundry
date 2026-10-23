@@ -1,0 +1,108 @@
+---------------------------------------
+Begin Slurm Prolog: Oct-11-2026 16:06:50
+Job ID:    6188466
+User ID:   kyin68
+Account:   coc
+Job name:  hyenadna-infer
+Partition: ice-gpu
+QOS:       coc-ice
+---------------------------------------
+== Job 6188466 on atl1-1-03-012-23-0.pace.gatech.edu ==
+Allocated GPU(s):
+name, compute_cap, memory.total [MiB]
+NVIDIA H100 80GB HBM3, 9.0, 81559 MiB
+
+== HyenaDNA inference environment setup ==
+Detected GPU: NVIDIA H100 80GB HBM3 (compute capability 9.0)
+-> compute capability > 8.6 (Ada/Hopper): upstream pin lacks kernels for this GPU.
+   using torch==2.1.2+cu118 instead (verified working on H100/H200).
+Conda env 'hyenadna-infer' already exists; reusing it.
+Looking in indexes: https://download.pytorch.org/whl/cu118
+Requirement already satisfied: torch==2.1.2+cu118 in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (2.1.2+cu118)
+Requirement already satisfied: torchvision==0.16.2+cu118 in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (0.16.2+cu118)
+Requirement already satisfied: filelock in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from torch==2.1.2+cu118) (3.32.3)
+Requirement already satisfied: typing-extensions in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from torch==2.1.2+cu118) (4.16.0)
+Requirement already satisfied: sympy in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from torch==2.1.2+cu118) (1.14.0)
+Requirement already satisfied: networkx in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from torch==2.1.2+cu118) (3.4.2)
+Requirement already satisfied: jinja2 in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from torch==2.1.2+cu118) (3.1.6)
+Requirement already satisfied: fsspec in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from torch==2.1.2+cu118) (2026.7.0)
+Requirement already satisfied: triton==2.1.0 in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from torch==2.1.2+cu118) (2.1.0)
+Requirement already satisfied: numpy in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from torchvision==0.16.2+cu118) (2.2.6)
+Requirement already satisfied: requests in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from torchvision==0.16.2+cu118) (2.28.1)
+Requirement already satisfied: pillow!=8.3.*,>=5.3.0 in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from torchvision==0.16.2+cu118) (12.3.0)
+Requirement already satisfied: MarkupSafe>=2.0 in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from jinja2->torch==2.1.2+cu118) (3.0.3)
+Requirement already satisfied: charset-normalizer<3,>=2 in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from requests->torchvision==0.16.2+cu118) (2.1.1)
+Requirement already satisfied: idna<4,>=2.5 in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from requests->torchvision==0.16.2+cu118) (3.4)
+Requirement already satisfied: urllib3<1.27,>=1.21.1 in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from requests->torchvision==0.16.2+cu118) (1.26.13)
+Requirement already satisfied: certifi>=2017.4.17 in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from requests->torchvision==0.16.2+cu118) (2022.12.7)
+Requirement already satisfied: mpmath<1.4,>=1.1.0 in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from sympy->torch==2.1.2+cu118) (1.3.0)
+Requirement already satisfied: transformers==4.26.1 in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (4.26.1)
+Requirement already satisfied: einops in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (0.8.2)
+Collecting numpy<2
+  Using cached numpy-1.26.4-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (61 kB)
+Requirement already satisfied: omegaconf in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (2.4.0)
+Requirement already satisfied: filelock in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from transformers==4.26.1) (3.32.3)
+Requirement already satisfied: huggingface-hub<1.0,>=0.11.0 in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from transformers==4.26.1) (0.36.2)
+Requirement already satisfied: packaging>=20.0 in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from transformers==4.26.1) (26.3)
+Requirement already satisfied: pyyaml>=5.1 in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from transformers==4.26.1) (6.0.3)
+Requirement already satisfied: regex!=2019.12.17 in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from transformers==4.26.1) (2026.9.29)
+Requirement already satisfied: requests in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from transformers==4.26.1) (2.28.1)
+Requirement already satisfied: tokenizers!=0.11.3,<0.14,>=0.11.1 in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from transformers==4.26.1) (0.13.3)
+Requirement already satisfied: tqdm>=4.27 in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from transformers==4.26.1) (4.70.1)
+Requirement already satisfied: fsspec>=2023.5.0 in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from huggingface-hub<1.0,>=0.11.0->transformers==4.26.1) (2026.7.0)
+Requirement already satisfied: hf-xet<2.0.0,>=1.1.3 in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from huggingface-hub<1.0,>=0.11.0->transformers==4.26.1) (1.7.0)
+Requirement already satisfied: typing-extensions>=3.7.4.3 in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from huggingface-hub<1.0,>=0.11.0->transformers==4.26.1) (4.16.0)
+Requirement already satisfied: charset-normalizer<3,>=2 in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from requests->transformers==4.26.1) (2.1.1)
+Requirement already satisfied: idna<4,>=2.5 in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from requests->transformers==4.26.1) (3.4)
+Requirement already satisfied: urllib3<1.27,>=1.21.1 in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from requests->transformers==4.26.1) (1.26.13)
+Requirement already satisfied: certifi>=2017.4.17 in /storage/ice1/3/6/kyin68/.conda/envs/hyenadna-infer/lib/python3.10/site-packages (from requests->transformers==4.26.1) (2022.12.7)
+Using cached numpy-1.26.4-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (18.2 MB)
+Installing collected packages: numpy
+  Attempting uninstall: numpy
+    Found existing installation: numpy 2.2.6
+    Uninstalling numpy-2.2.6:
+      Successfully uninstalled numpy-2.2.6
+Successfully installed numpy-1.26.4
+Upstream hyena-dna checkout already present at /storage/ice1/3/6/kyin68/hyenadna/environment/../vendor/hyena-dna
+== Setup complete ==
+conda env:        hyenadna-infer
+python:           Python 3.10.22
+torch:             2.1.2+cu118 cuda: 11.8
+cuda available:    True
+hyena-dna checkout: /storage/ice1/3/6/kyin68/hyenadna/environment/../vendor/hyena-dna @ d553021
+
+== Running inference ==
+Loaded pretrained weights for hyenadna-tiny-1k-seqlen ok.
+Input record: NM_000518.5 Homo sapiens hemoglobin subunit beta (HBB), mRNA
+Sequence length: 628 nt (checkpoint max context: 1024)
+[real] embedding shape=(630, 128), mean log-lik=-1.3416, perplexity=3.8250
+[scrambled] embedding shape=(630, 128), mean log-lik=-1.4380, perplexity=4.2122
+
+Saved outputs to /storage/ice1/3/6/kyin68/hyenadna/results
+Smoke test passed: both forward passes completed with finite, correctly-shaped output.
+
+== Validating output ==
+== Smoke test ==
+  PASS: all output files present, correctly shaped, and finite.
+
+== Substantive validation ==
+  real sequence:      mean log-lik = -1.3416 nats, perplexity = 3.8250
+  scrambled control:  mean log-lik = -1.4380 nats, perplexity = 4.2122
+  gap (real - scrambled): 0.0964 nats (PASS)
+  PASS: the pretrained model finds the real human mRNA sequence more predictable (lower perplexity) than a composition-matched random shuffle, consistent with the checkpoint having learned real genomic sequence structure during pretraining.
+
+Full report written to /storage/ice1/3/6/kyin68/hyenadna/results/validation_report.json
+
+== Done. See results/ for outputs and logs/hyenadna-infer-6188466.out for the full log. ==
+---------------------------------------
+Begin Slurm Epilog: Oct-11-2026 16:07:19
+Job ID:        6188466
+User ID:       kyin68
+Account:       coc
+Job name:      hyenadna-infer
+Resources:     cpu=4,gres/gpu:h100=1,mem=32G,node=1
+Rsrc Used:     cput=00:01:56,vmem=0,walltime=00:00:29,mem=1076020K,energy_used=0
+Partition:     ice-gpu
+QOS:           coc-ice
+Nodes:         atl1-1-03-012-23-0
+---------------------------------------

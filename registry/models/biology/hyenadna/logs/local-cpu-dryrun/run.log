@@ -1,0 +1,20 @@
+/tmp/claude-1000/-home-elliptic/48722c39-787c-4742-84a7-88864053fb59/scratchpad/hyenadna-cpu-venv/lib64/python3.10/site-packages/torch/jit/_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+Loaded pretrained weights for hyenadna-tiny-1k-seqlen ok.
+Input record: NM_000518.5 Homo sapiens hemoglobin subunit beta (HBB), mRNA
+Sequence length: 628 nt (checkpoint max context: 1024)
+[real] embedding shape=(630, 128), mean log-lik=-1.3416, perplexity=3.8250
+[scrambled] embedding shape=(630, 128), mean log-lik=-1.4380, perplexity=4.2122
+
+Saved outputs to /home/elliptic/Downloads/VIP/cybershuttle-ai4science-foundry/registry/models/biology/hyenadna/results
+Smoke test passed: both forward passes completed with finite, correctly-shaped output.
+== Smoke test ==
+  PASS: all output files present, correctly shaped, and finite.
+
+== Substantive validation ==
+  real sequence:      mean log-lik = -1.3416 nats, perplexity = 3.8250
+  scrambled control:  mean log-lik = -1.4380 nats, perplexity = 4.2122
+  gap (real - scrambled): 0.0964 nats (PASS)
+  PASS: the pretrained model finds the real human mRNA sequence more predictable (lower perplexity) than a composition-matched random shuffle, consistent with the checkpoint having learned real genomic sequence structure during pretraining.
+
+Full report written to /home/elliptic/Downloads/VIP/cybershuttle-ai4science-foundry/registry/models/biology/hyenadna/results/validation_report.json

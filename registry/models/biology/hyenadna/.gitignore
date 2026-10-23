@@ -1,0 +1,10 @@
+# Reproducible from pinned identifiers in README.md / model.yaml — not committed.
+vendor/
+checkpoints/
+results/
+__pycache__/
+*.pyc
+
+# keep the execution-evidence logs (job .out/.err + validation_report.json),
+# they are the record this entry's README points to; only ignore scratch files
+logs/*.tmp

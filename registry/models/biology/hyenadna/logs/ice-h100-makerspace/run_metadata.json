@@ -1,0 +1,29 @@
+{
+  "checkpoint": "hyenadna-tiny-1k-seqlen",
+  "device": "cuda",
+  "torch_version": "2.1.2+cu118",
+  "torch_cuda_version": "11.8",
+  "input_fasta": "/storage/ice1/3/6/kyin68/hyenadna/data/NM_000518.5_HBB_mRNA.fasta",
+  "fasta_header": "NM_000518.5 Homo sapiens hemoglobin subunit beta (HBB), mRNA",
+  "seed": 0,
+  "results": {
+    "real": {
+      "sequence_length": 628,
+      "embedding_shape": [
+        630,
+        128
+      ],
+      "mean_next_nucleotide_loglik": -1.3415653705596924,
+      "perplexity": 3.825026273727417
+    },
+    "scrambled": {
+      "sequence_length": 628,
+      "embedding_shape": [
+        630,
+        128
+      ],
+      "mean_next_nucleotide_loglik": -1.4379760026931763,
+      "perplexity": 4.212162017822266
+    }
+  }
+}

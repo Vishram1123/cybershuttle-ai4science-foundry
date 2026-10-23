@@ -1,0 +1,16 @@
+{
+  "smoke_test": {"passed": true, "problems": []},
+  "substantive_validation": {
+    "check": "real sequence should have higher mean next-nucleotide log-likelihood (lower perplexity) than its scrambled control",
+    "real_mean_loglik_nats": -1.3415653705596924,
+    "scrambled_mean_loglik_nats": -1.4379760026931763,
+    "real_perplexity": 3.825026273727417,
+    "scrambled_perplexity": 4.212162017822266,
+    "loglik_gap_nats": 0.09641063213348389,
+    "margin_required_nats": 0.0,
+    "passed": true,
+    "interpretation": "PASS: the pretrained model finds the real human mRNA sequence more predictable (lower perplexity) than a composition-matched random shuffle, consistent with the checkpoint having learned real genomic sequence structure during pretraining."
+  },
+  "checkpoint": "hyenadna-tiny-1k-seqlen",
+  "device": "cpu"
+}

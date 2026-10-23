@@ -1,0 +1,142 @@
+# yaml-language-server: $schema=../../../../schemas/model.schema.json
+
+id: hyenadna
+name: HyenaDNA
+version: "1.0"
+
+description: >
+  HyenaDNA is a genomic foundation model pretrained with a causal next-nucleotide
+  (single-token) language modeling objective on the human reference genome (HG38).
+  It replaces attention with the implicit long-convolution Hyena operator, which
+  lets it scale to context lengths up to 1,000,000 tokens at single-nucleotide
+  resolution with sub-quadratic cost. Released as a family of checkpoints at
+  increasing context length (1k to 1M), trading off model size and sequence length.
+
+domain:
+  - biology
+  - genomics
+  - sequence-modeling
+
+model_family:
+  - hyena-operator
+  - long-convolution
+  - foundation-model
+  - autoregressive
+  - decoder-only
+
+tasks:
+  - inference
+  - feature-extraction
+  - fine-tuning
+  - training
+
+upstream:
+  github: https://github.com/HazyResearch/hyena-dna
+  paper: https://arxiv.org/abs/2306.15794
+  paper_title: "HyenaDNA: Long-Range Genomic Sequence Modeling at Single Nucleotide Resolution"
+  huggingface: LongSafari/hyenadna-tiny-1k-seqlen
+  license: Apache-2.0
+  other:
+    - "Pinned upstream commit used for this entry: d553021b483b82980aa4b868b37ec2d4332e198a (2023-12-03)"
+    - "Pretrained checkpoints are hosted separately under the LongSafari org on Hugging Face; most checkpoint sizes are tagged bsd-3-clause on their model cards, but license text is not bundled in-repo — verify directly on each checkpoint's HF model card before redistribution, and double-check the hyenadna-large-1m-seqlen card specifically (one source lists it as a custom license, inconsistent with the smaller checkpoints)."
+
+lifecycle:
+  supported_stages:
+    - inference
+    - fine-tuning
+    - training
+
+datasets:
+  pretraining:
+    - id: hg38
+      description: >
+        Human reference genome (GRCh38/hg38), ~24 chromosome-level sequences merged
+        into one FASTA, pretraining done with a next-nucleotide (causal LM) objective.
+      source: https://storage.googleapis.com/basenji_barnyard2/hg38.ml.fa.gz
+  recommended:
+    - genomic-benchmarks
+    - nucleotide-transformer-downstream-tasks
+
+checkpoints:
+  - id: hyenadna-tiny-1k-seqlen
+    max_context: 1024
+    notes: Smallest checkpoint; fine-tunable on a single consumer/Colab-class GPU. Used for the smoke-test/validation recipe in this entry.
+  - id: hyenadna-small-32k-seqlen
+    max_context: 32768
+  - id: hyenadna-medium-160k-seqlen
+    max_context: 160000
+  - id: hyenadna-medium-450k-seqlen
+    max_context: 450000
+  - id: hyenadna-large-1m-seqlen
+    max_context: 1000000
+    notes: Full 1M context length as reported in the paper; recommended minimum 1x A100-80GB for inference.
+
+input:
+  format: raw nucleotide string
+  description: >
+    Character-level DNA sequence over the alphabet {A, C, G, T, N}. No k-mer or
+    BPE tokenization — each nucleotide is one token, enabling single-nucleotide
+    resolution. Tokenized with the repo's CharacterTokenizer (left-padded, causal).
+  example: "ACGT..."
+
+output:
+  inference:
+    format: per-position hidden states / embeddings (float32, hidden_size depends on checkpoint), or next-nucleotide logits with use_head=True
+    description: >
+      Embeddings suitable for downstream genomic classification/regression tasks
+      (e.g. species or regulatory-element prediction), or causal LM logits over the
+      5-symbol vocabulary for next-nucleotide prediction and sequence likelihood scoring.
+
+software:
+  python: ">=3.8,<3.11"
+  frameworks:
+    - torch  # version selected at setup time based on allocated GPU compute capability — see environment/setup_env.sh
+    - torchvision  # standalone_hyenadna.py imports torchvision.ops.StochasticDepth at module load, even though inference never calls it
+    - transformers==4.26.1
+    - einops
+    - omegaconf  # weights.ckpt is a Lightning checkpoint with a pickled OmegaConf object alongside the tensors; needed to unpickle it, not to read its contents
+  notes: >
+    Pure embedding/inference via the upstream `huggingface.py` + `standalone_hyenadna.py`
+    path needs no custom CUDA kernel build (flash-attention) — that's only for
+    training-time fused-kernel speedups, not pretrained inference. It does still pull
+    in torchvision and omegaconf as incidental import-time/unpickling dependencies
+    (found by actually running the pipeline end to end locally on CPU before ever
+    touching PACE, not by reading the upstream README — see environment/setup_env.sh
+    and registry/models/biology/hyenadna/README.md's Troubleshooting section).
+    This keeps the inference-only environment easy to port across GPU
+    architectures, which matters because the upstream repo's pinned
+    torch==1.13.0+cu117 was compiled with kernels only through sm_86 (Ampere) and
+    silently fails to run on sm_90 (Hopper, e.g. H100/H200) GPUs that GT's
+    AI Makerspace / ICE ice-gpu partition can allocate. See
+    environment/setup_env.sh for the compute-capability-based torch/CUDA selection
+    this entry uses to stay portable across V100 / A100 / H100 / H200.
+
+resource_profiles:
+  recommended:
+    - "GT PACE ICE, ice-gpu partition (incl. AI Makerspace H100/H200 allocation) — request a generation-specific gres (e.g. --gres=gpu:h100:1) to avoid the partition's non-CUDA AMD MI210 nodes; see environment/setup_env.sh for the compute-capability detection that handles V100/A100/H100/H200 within this one partition"
+
+cybershuttle:
+  enabled: false
+
+readiness:
+  registry_status: registered
+  nexus_validation: untested
+  benchmark_status: not-started
+  optimization_status: not-started
+  workflow_status: candidate
+  container_status: not-started
+  last_updated: "2026-10-10"
+  notes: >
+    Inference recipe (registry/models/biology/hyenadna/recipes/inference-nextnucleotide.yaml)
+    is runnable end-to-end on GT PACE ICE / AI Makerspace, including GPU-architecture
+    auto-detection for the torch/CUDA build. Execution logs and validation output are
+    tracked under registry/models/biology/hyenadna/logs/. Downstream species-classification
+    task and reduced-scale pretraining reproduction are planned next (see README.md).
+
+maintainers:
+  - name: Kevin Yin
+    github: "@kyin68"
+    affiliation: Georgia Institute of Technology
+  - name: Elliptic461
+    github: "@Elliptic461"
+    affiliation: Georgia Institute of Technology
